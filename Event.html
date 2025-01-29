@@ -44,7 +44,6 @@
     </style>
 </head>
 <body>
-
 <h2>Event Scheduler</h2>
 
 <!-- Form to Add Events -->
@@ -61,30 +60,24 @@
 
     <button onclick="addEvent()">Add Event</button>
 </div>
-
 <!-- Displaying the Event Schedule -->
 <div id="schedule">
     <!-- Events will be added dynamically here -->
 </div>
-
 <!-- Conflicts and Resolution -->
 <div id="conflicts">
     <h3>Conflicting Events:</h3>
     <ul id="conflictList"></ul>
 </div>
-
 <div id="resolutions">
     <h3>Suggested Resolutions:</h3>
     <ul id="resolutionList"></ul>
 </div>
-
 <script>
     // Working hours for event scheduling
     const workingHours = { start: "08:00", end: "18:00" };
-
     // Array to store events
     const events = [];
-
     // Function to convert time string to Date object for comparison
     function timeToDate(time) {
         const [hour, minute] = time.split(":").map(Number);
@@ -92,7 +85,6 @@
         date.setHours(hour, minute, 0, 0);
         return date;
     }
-
     // Function to find conflicts between events
     function findConflicts(events) {
         const conflicts = [];
@@ -100,7 +92,6 @@
             for (let j = i + 1; j < events.length; j++) {
                 const e1 = events[i];
                 const e2 = events[j];
-
                 const e1Start = timeToDate(e1.start);
                 const e1End = timeToDate(e1.end);
                 const e2Start = timeToDate(e2.start);
@@ -113,45 +104,37 @@
         }
         return conflicts;
     }
-
     // Function to suggest resolution for conflicts
     function suggestResolution(eventToReschedule) {
     const sortedEvents = [...events].sort((a, b) => timeToDate(a.start) - timeToDate(b.start));
     const workStart = timeToDate(workingHours.start);
     const workEnd = timeToDate(workingHours.end);
     const eventDuration = timeToDate(eventToReschedule.end) - timeToDate(eventToReschedule.start);
-
     // Check gaps between events for a conflict-free slot
     let previousEnd = workStart;
     for (let i = 0; i < sortedEvents.length; i++) {
         const currentStart = timeToDate(sortedEvents[i].start);
-
         if (currentStart - previousEnd >= eventDuration) {
             const newStart = previousEnd;
             const newEnd = new Date(newStart.getTime() + eventDuration);
-
             return {
                 name: eventToReschedule.name,
                 start: `${newStart.getHours()}:${newStart.getMinutes().toString().padStart(2, "0")}`,
                 end: `${newEnd.getHours()}:${newEnd.getMinutes().toString().padStart(2, "0")}`
             };
         }
-
         previousEnd = timeToDate(sortedEvents[i].end);
     }
-
     // Check if it fits at the end of the working hours
     if (workEnd - previousEnd >= eventDuration) {
         const newStart = previousEnd;
         const newEnd = new Date(newStart.getTime() + eventDuration);
-
         return {
             name: eventToReschedule.name,
             start: `${newStart.getHours()}:${newStart.getMinutes().toString().padStart(2, "0")}`,
             end: `${newEnd.getHours()}:${newEnd.getMinutes().toString().padStart(2, "0")}`
         };
     }
-
     // No available slots
     return {
         name: eventToReschedule.name,
@@ -159,8 +142,6 @@
         end: ""
     };
 }
-
-
     // Function to count conflicts for each event
     function countConflicts(conflicts) {
         const conflictCount = {};
@@ -170,7 +151,6 @@
         });
         return conflictCount;
     }
-
     // Function to display the schedule, conflicts, and resolutions
     function displaySchedule() {
         const scheduleDiv = document.getElementById("schedule");
@@ -183,44 +163,35 @@
             eventDiv.textContent = `${event.name}, Start: ${event.start}, End: ${event.end}`;
             scheduleDiv.appendChild(eventDiv);
         });
-
         // Display conflicts
         const conflicts = findConflicts(events);
         const conflictList = document.getElementById("conflictList");
         const resolutionList = document.getElementById("resolutionList");
-
         conflictList.innerHTML = '';
         resolutionList.innerHTML = '';
-
         // Count the conflicts
         const conflictCount = countConflicts(conflicts);
-
         // Sort conflicts by the most conflicting event
         const mostConflictingEvent = Object.entries(conflictCount).sort((a, b) => b[1] - a[1])[0][0];
-
         // Suggest resolution for the most conflicting event
         const eventToReschedule = events.find(event => event.name === mostConflictingEvent);
         const resolution = suggestResolution(eventToReschedule);
-
         // Show conflicting events
         conflicts.forEach(([e1, e2]) => {
             const conflictItem = document.createElement("li");
             conflictItem.textContent = `${e1} and ${e2}`;
             conflictList.appendChild(conflictItem);
         });
-
         // Show suggested resolution
         const resolutionItem = document.createElement("li");
         resolutionItem.textContent = `Reschedule "${resolution.name}" to Start: ${resolution.start}, End: ${resolution.end}`;
         resolutionList.appendChild(resolutionItem);
     }
-
     // Function to add a new event
     function addEvent() {
         const description = document.getElementById("description").value;
         const startTime = document.getElementById("startTime").value;
         const endTime = document.getElementById("endTime").value;
-
         if (description && startTime && endTime) {
             // Add new event to the events array
             const newEvent = {
@@ -229,22 +200,18 @@
                 end: endTime
             };
             events.push(newEvent);
-
             // Clear the input fields
             document.getElementById("description").value = '';
             document.getElementById("startTime").value = '';
             document.getElementById("endTime").value = '';
-
             // Update the schedule and conflicts
             displaySchedule();
         } else {
             alert("Please fill in all fields!");
         }
     }
-
     // Initialize the page
     displaySchedule();
 </script>
-
 </body>
 </html>
