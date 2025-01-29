@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fungible Token System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        input, button {
+            margin: 5px;
+            padding: 8px;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+        }
+        .balance-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Fungible Token System</h2>
+        
+        <h3>Create Account</h3>
+        <input type="text" id="accountName" placeholder="Enter account name">
+        <button onclick="createAccount()">Create</button>
+
+        <h3>Mint Tokens</h3>
+        <input type="number" id="mintAmount" placeholder="Enter amount">
+        <button onclick="mintTokens()">Mint</button>
+
+        <h3>Distribute Tokens</h3>
+        <input type="number" id="distributeAmount" placeholder="Enter amount">
+        <input type="text" id="distributionAccounts" placeholder="Enter accounts (comma separated)">
+        <button onclick="distributeTokens()">Distribute</button>
+
+        <h3>Transfer Tokens</h3>
+        <input type="text" id="sender" placeholder="Sender">
+        <input type="text" id="recipient" placeholder="Recipient">
+        <input type="number" id="transferAmount" placeholder="Amount">
+        <button onclick="transferTokens()">Transfer</button>
+
+        <h3>Check Balance</h3>
+        <input type="text" id="balanceAccount" placeholder="Enter account name">
+        <button onclick="checkBalance()">Check</button>
+        <div id="balanceResult" class="balance-box"></div>
+
+        <h3>All Balances</h3>
+        <button onclick="showAllBalances()">Show All</button>
+        <div id="allBalances" class="balance-box"></div>
+    </div>
+
+    <script>
+        let token = {
+            name: "MyToken",
+            symbol: "MTK",
+            totalSupply: 1000,
+            accounts: { "Treasury": 1000 }
+        };
+
+        function createAccount() {
+            let name = document.getElementById("accountName").value.trim();
+            if (!name) {
+                alert("Please enter a valid account name.");
+                return;
+            }
+            if (token.accounts[name]) {
+                alert("Account already exists!");
+                return;
+            }
+            token.accounts[name] = 0;
+            alert("Account '" + name + "' created successfully!");
+        }
+
+        function mintTokens() {
+            let amount = parseInt(document.getElementById("mintAmount").value);
+            if (isNaN(amount) || amount <= 0) {
+                alert("Enter a valid amount.");
+                return;
+            }
+            token.accounts["Treasury"] += amount;
+            token.totalSupply += amount;
+            alert(amount + " " + token.symbol + " minted successfully!");
+        }
+
+        function distributeTokens() {
+            let amount = parseInt(document.getElementById("distributeAmount").value);
+            let accountNames = document.getElementById("distributionAccounts").value.split(",").map(name => name.trim());
+
+            if (isNaN(amount) || amount <= 0 || accountNames.length === 0) {
+                alert("Enter a valid amount and at least one account.");
+                return;
+            }
+            if (token.accounts["Treasury"] < amount) {
+                alert("Not enough balance in Treasury to distribute.");
+                return;
+            }
+            let tokensPerAccount = Math.floor(amount / accountNames.length);
+            accountNames.forEach(account => {
+                if (token.accounts[account] !== undefined) {
+                    token.accounts[account] += tokensPerAccount;
+                } else {
+                    alert("Account " + account + " does not exist.");
+                }
+            });
+            token.accounts["Treasury"] -= amount;
+            alert(amount + " " + token.symbol + " distributed among accounts.");
+        }
+
+        function transferTokens() {
+            let sender = document.getElementById("sender").value.trim();
+            let recipient = document.getElementById("recipient").value.trim();
+            let amount = parseInt(document.getElementById("transferAmount").value);
+
+            if (!token.accounts[sender] || !token.accounts[recipient]) {
+                alert("One or both accounts do not exist.");
+                return;
+            }
+            if (token.accounts[sender] < amount) {
+                alert("Insufficient balance!");
+                return;
+            }
+            token.accounts[sender] -= amount;
+            token.accounts[recipient] += amount;
+            alert("Transferred " + amount + " " + token.symbol + " from " + sender + " to " + recipient);
+        }
+
+        function checkBalance() {
+            let account = document.getElementById("balanceAccount").value.trim();
+            if (!token.accounts[account]) {
+                document.getElementById("balanceResult").innerHTML = "Account not found!";
+                return;
+            }
+            document.getElementById("balanceResult").innerHTML = account + " Balance: " + token.accounts[account] + " " + token.symbol;
+        }
+
+        function showAllBalances() {
+            let result = "<strong>All Account Balances:</strong><br>";
+            for (let acc in token.accounts) {
+                result += acc + ": " + token.accounts[acc] + " " + token.symbol + "<br>";
+            }
+            document.getElementById("allBalances").innerHTML = result;
+        }
+    </script>
+
+</body>
+</html>
