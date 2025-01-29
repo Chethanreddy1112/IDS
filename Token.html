@@ -37,12 +37,12 @@
         <h3>Mint Tokens</h3>
         <input type="number" id="mintAmount" placeholder="Enter amount">
         <button onclick="mintTokens()">Mint</button>
-
+        
         <h3>Distribute Tokens</h3>
         <input type="number" id="distributeAmount" placeholder="Enter amount">
         <input type="text" id="distributionAccounts" placeholder="Enter accounts (comma separated)">
         <button onclick="distributeTokens()">Distribute</button>
-
+        
         <h3>Transfer Tokens</h3>
         <input type="text" id="sender" placeholder="Sender">
         <input type="text" id="recipient" placeholder="Recipient">
@@ -58,7 +58,6 @@
         <button onclick="showAllBalances()">Show All</button>
         <div id="allBalances" class="balance-box"></div>
     </div>
-
     <script>
         let token = {
             name: "MyToken",
@@ -66,7 +65,6 @@
             totalSupply: 1000,
             accounts: { "Treasury": 1000 }
         };
-
         function createAccount() {
             let name = document.getElementById("accountName").value.trim();
             if (!name) {
@@ -80,7 +78,6 @@
             token.accounts[name] = 0;
             alert("Account '" + name + "' created successfully!");
         }
-
         function mintTokens() {
             let amount = parseInt(document.getElementById("mintAmount").value);
             if (isNaN(amount) || amount <= 0) {
@@ -91,7 +88,6 @@
             token.totalSupply += amount;
             alert(amount + " " + token.symbol + " minted successfully!");
         }
-
         function distributeTokens() {
             let amount = parseInt(document.getElementById("distributeAmount").value);
             let accountNames = document.getElementById("distributionAccounts").value.split(",").map(name => name.trim());
@@ -115,7 +111,6 @@
             token.accounts["Treasury"] -= amount;
             alert(amount + " " + token.symbol + " distributed among accounts.");
         }
-
         function transferTokens() {
             let sender = document.getElementById("sender").value.trim();
             let recipient = document.getElementById("recipient").value.trim();
@@ -151,6 +146,5 @@
             document.getElementById("allBalances").innerHTML = result;
         }
     </script>
-
 </body>
 </html>
